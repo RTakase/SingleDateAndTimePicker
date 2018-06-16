@@ -16,7 +16,7 @@ import java.util.List;
 
 import static com.github.florent37.singledateandtimepicker.widget.SingleDateAndTimeConstants.*;
 
-public class WheelDayPicker extends WheelPicker<String> {
+public class WheelDayPicker extends WheelPicker<String> implements LinkableWheelPicker<Long>, LimitableWheelPicker<Long, Date> {
 
     private SimpleDateFormat simpleDateFormat;
 
@@ -59,28 +59,37 @@ public class WheelDayPicker extends WheelPicker<String> {
             onDaySelectedListener.onDaySelected(this, position, item, date);
         }
     }
-
+    
     @Override
     protected List<String> generateAdapterValues() {
         final List<String> days = new ArrayList<>();
-
+        
         Calendar instance = Calendar.getInstance();
         instance.add(Calendar.DATE, -1 * DAYS_PADDING - 1);
+        instance.set(Calendar.HOUR_OF_DAY, 0);
+        instance.set(Calendar.MINUTE, 0);
+        instance.set(Calendar.SECOND, 0);
+        
         for (int i = (-1) * DAYS_PADDING; i < 0; ++i) {
             instance.add(Calendar.DAY_OF_MONTH, 1);
-            days.add(getFormattedValue(instance.getTime()));
+            
+            if (!isOutOfLimit(instance.getTime())) {
+                days.add(getFormattedValue(instance.getTime()));
+            }
         }
-
+        
         //today
-        days.add(getTodayText());
-
-        instance = Calendar.getInstance();
-
-        for (int i = 0; i < DAYS_PADDING; ++i) {
-            instance.add(Calendar.DATE, 1);
+        instance.add(Calendar.DAY_OF_MONTH, 1);
+        if (!isOutOfLimit(instance.getTime())) {
             days.add(getFormattedValue(instance.getTime()));
         }
-
+        
+        for (int i = 0; i < DAYS_PADDING; ++i) {
+            instance.add(Calendar.DAY_OF_MONTH, 1);
+            if (!isOutOfLimit(instance.getTime())) {
+                days.add(getFormattedValue(instance.getTime()));
+            }
+        }
         return days;
     }
 
@@ -133,7 +142,61 @@ public class WheelDayPicker extends WheelPicker<String> {
             notifyDatasetChanged();
         }
     }
+    
+    private Long currentTime;
+    
+    @Override
+    public Long getGlobalValue() {
+        return currentTime;
+    }
+    
+    @Override
+    public void setGlobalValue(Long value) {
+        Long current = getGlobalValue();
+        currentTime = value;
+        if (!value.equals(current)) {
+            updateAdapter();
+        }
+    }
+    
+    private long earlierLimit, laterLimit;
+    @NonNull @Override
+    public Long getEarlierLimit() {
+        return earlierLimit;
+    }
+    
+    @NonNull @Override
+    public Long getLaterLimit() {
+        return laterLimit;
+    }
+    
+    @Override
+    public void setLimit(Long earlier, Long later) {
+        Calendar cal = Calendar.getInstance();
+        
+        cal.setTimeInMillis(earlier * 1000);
+        
+        //to display today
+        cal.add(Calendar.DATE, -1);
+        earlierLimit = cal.getTimeInMillis() / 1000;
 
+        laterLimit = later;
+        
+        updateAdapter();
+    }
+    
+    @Override
+    public boolean isOutOfLimit(Date value) {
+        if (getEarlierLimit() == 0 ||
+            getLaterLimit() == 0 ||
+            getEarlierLimit() > getLaterLimit()) {
+            return true;
+        }
+        
+        long time = value.getTime() / 1000;
+        return getEarlierLimit() > time || time > getLaterLimit();
+    }
+    
     public interface OnDaySelectedListener {
         void onDaySelected(WheelDayPicker picker, int position, String name, Date date);
     }
