@@ -4,8 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 
-import com.github.florent37.singledateandtimepicker.DateHelper;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,7 +15,7 @@ import static com.github.florent37.singledateandtimepicker.widget.SingleDateAndT
 import static com.github.florent37.singledateandtimepicker.widget.SingleDateAndTimeConstants.MAX_HOUR_DEFAULT;
 import static com.github.florent37.singledateandtimepicker.widget.SingleDateAndTimeConstants.MIN_HOUR_DEFAULT;
 
-public class WheelHourPicker extends WheelPicker<String> {
+public class WheelHourPicker extends WheelPicker<String> implements LinkableWheelPicker<Long>, LimitableWheelPicker<Long, Integer> {
 
     private int minHour;
     private int maxHour;
@@ -51,15 +49,21 @@ public class WheelHourPicker extends WheelPicker<String> {
     @Override
     protected List<String> generateAdapterValues() {
         final List<String> hours = new ArrayList<>();
-
+    
         if (isAmPm) {
-            hours.add(getFormattedValue(12));
+            if (!isOutOfLimit(12)) {
+                hours.add(getFormattedValue(12));
+            }
             for (int hour = hoursStep; hour < maxHour; hour += hoursStep) {
-                hours.add(getFormattedValue(hour));
+                if (!isOutOfLimit(hour)) {
+                    hours.add(getFormattedValue(hour));
+                }
             }
         } else {
             for (int hour = minHour; hour <= maxHour; hour += hoursStep) {
-                hours.add(getFormattedValue(hour));
+                if (!isOutOfLimit(hour)) {
+                    hours.add(getFormattedValue(hour));
+                }
             }
         }
 
@@ -185,5 +189,61 @@ public class WheelHourPicker extends WheelPicker<String> {
 
     public interface OnHourChangedListener {
         void onHourChanged(WheelHourPicker picker, int hour);
+    }
+    
+    private long earlierLimit, laterLimit;
+    
+    @NonNull
+    @Override
+    public Long getEarlierLimit() {
+        return earlierLimit;
+    }
+    
+    @NonNull
+    @Override
+    public Long getLaterLimit() {
+        return laterLimit;
+    }
+    
+    @Override
+    public void setLimit(Long earlier, Long later) {
+        earlierLimit = earlier;
+        laterLimit = later;
+        updateAdapter();
+    }
+    
+    @Override
+    public boolean isOutOfLimit(Integer value) {
+        if (getEarlierLimit() == 0 ||
+            getLaterLimit() == 0 ||
+            getEarlierLimit() > getLaterLimit()) {
+            return true;
+        }
+        
+        if (getGlobalValue() == null) {
+            return false;
+        }
+        
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(getGlobalValue() * 1000);
+        cal.set(Calendar.HOUR_OF_DAY, value);
+        long time = cal.getTimeInMillis() / 1000;
+        return getEarlierLimit() > time || time > getLaterLimit();
+    }
+    
+    private Long currentTime;
+    
+    @Override
+    public Long getGlobalValue() {
+        return currentTime;
+    }
+    
+    @Override
+    public void setGlobalValue(Long value) {
+        Long current = getGlobalValue();
+        currentTime = value;
+        if (!value.equals(current)) {
+            updateAdapter();
+        }
     }
 }

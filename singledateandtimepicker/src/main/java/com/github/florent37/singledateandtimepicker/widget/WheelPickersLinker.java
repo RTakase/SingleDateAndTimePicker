@@ -46,6 +46,16 @@ public class WheelPickersLinker<T extends LinkableWheelPicker<Long> & LimitableW
 					updateCurrentTime(currentTime, newTime);
 				}
 			});
+		} else if (picker instanceof WheelMinutePicker) {
+			WheelMinutePicker minPicker = (WheelMinutePicker)picker;
+			
+			minPicker.setOnMinuteChangedListener(new WheelMinutePicker.OnMinuteChangedListener() {
+				@Override
+				public void onMinuteChanged(WheelMinutePicker picker, int minutes) {
+					long newTime = getCurrentTime();
+					updateCurrentTime(currentTime, newTime);
+				}
+			});
 		}
 		
 		pickers.add(picker);
@@ -76,8 +86,6 @@ public class WheelPickersLinker<T extends LinkableWheelPicker<Long> & LimitableW
 				minInSec = TimeUnit.SECONDS.convert(minPicker.getCurrentMinute(), TimeUnit.MINUTES);
 			}
 		}
-		
-		minInSec = 0;
 		
 		return dayInSec + hourInSec + minInSec;
 	}

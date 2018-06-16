@@ -15,7 +15,7 @@ import static com.github.florent37.singledateandtimepicker.widget.SingleDateAndT
 import static com.github.florent37.singledateandtimepicker.widget.SingleDateAndTimeConstants.MIN_MINUTES;
 import static com.github.florent37.singledateandtimepicker.widget.SingleDateAndTimeConstants.STEP_MINUTES_DEFAULT;
 
-public class WheelMinutePicker extends WheelPicker<String> {
+public class WheelMinutePicker extends WheelPicker<String> implements LinkableWheelPicker<Long>, LimitableWheelPicker<Long, Integer> {
 
     private int stepMinutes;
 
@@ -123,5 +123,61 @@ public class WheelMinutePicker extends WheelPicker<String> {
 
     public interface OnFinishedLoopListener {
         void onFinishedLoop(WheelMinutePicker picker);
+    }
+    
+    private long earlierLimit, laterLimit;
+    
+    @NonNull
+    @Override
+    public Long getEarlierLimit() {
+        return earlierLimit;
+    }
+    
+    @NonNull
+    @Override
+    public Long getLaterLimit() {
+        return laterLimit;
+    }
+    
+    @Override
+    public void setLimit(Long earlier, Long later) {
+        earlierLimit = earlier;
+        laterLimit = later;
+        updateAdapter();
+    }
+    
+    @Override
+    public boolean isOutOfLimit(Integer value) {
+        if (getEarlierLimit() == 0 ||
+            getLaterLimit() == 0 ||
+            getEarlierLimit() > getLaterLimit()) {
+            return true;
+        }
+        
+        if (getGlobalValue() == null) {
+            return false;
+        }
+        
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(getGlobalValue() * 1000);
+        cal.set(Calendar.MINUTE, value);
+        long time = cal.getTimeInMillis() / 1000;
+        return getEarlierLimit() > time || time > getLaterLimit();
+    }
+    
+    private Long currentTime;
+    
+    @Override
+    public Long getGlobalValue() {
+        return currentTime;
+    }
+    
+    @Override
+    public void setGlobalValue(Long value) {
+        Long current = getGlobalValue();
+        currentTime = value;
+        if (!value.equals(current)) {
+            updateAdapter();
+        }
     }
 }
