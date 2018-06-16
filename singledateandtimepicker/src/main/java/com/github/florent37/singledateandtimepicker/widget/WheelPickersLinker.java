@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public class WheelPickersLinker<T extends LinkableWheelPicker<Long> & LimitableWheelPicker<Long, ?>> {
+public class WheelPickersLinker<T extends WheelPicker & LinkableWheelPicker<Long> & LimitableWheelPicker<Long, ?>> {
 	private ArrayList<T> pickers = new ArrayList<>();
 	
 	private long earlierLimit;
@@ -22,6 +22,13 @@ public class WheelPickersLinker<T extends LinkableWheelPicker<Long> & LimitableW
 		this.laterLimit = laterLimit;
 	}
 	
+	public void setDefaultDate(Date date) {
+		for (T picker: pickers) {
+			picker.setDefaultDate(date);
+		}
+		updateCurrentTime(-1, date.getTime()/1000);
+	}
+	
 	public void addWheelPicker(T picker) {
 		picker.setLimit(earlierLimit, laterLimit);
 		
@@ -31,8 +38,7 @@ public class WheelPickersLinker<T extends LinkableWheelPicker<Long> & LimitableW
 			dayPicker.setOnDaySelectedListener(new WheelDayPicker.OnDaySelectedListener() {
 				@Override
 				public void onDaySelected(WheelDayPicker picker, int position, String name, Date date) {
-					long newTime = getCurrentTime();
-					updateCurrentTime(currentTime, newTime);
+					updateCurrentTime();
 				}
 			});
 			dayPicker.setDayFormatter(new SimpleDateFormat("MM/dd(E)"));
@@ -42,8 +48,7 @@ public class WheelPickersLinker<T extends LinkableWheelPicker<Long> & LimitableW
 			hourPicker.setHourChangedListener(new WheelHourPicker.OnHourChangedListener() {
 				@Override
 				public void onHourChanged(WheelHourPicker picker, int hour) {
-					long newTime = getCurrentTime();
-					updateCurrentTime(currentTime, newTime);
+					updateCurrentTime();
 				}
 			});
 		} else if (picker instanceof WheelMinutePicker) {
@@ -52,8 +57,7 @@ public class WheelPickersLinker<T extends LinkableWheelPicker<Long> & LimitableW
 			minPicker.setOnMinuteChangedListener(new WheelMinutePicker.OnMinuteChangedListener() {
 				@Override
 				public void onMinuteChanged(WheelMinutePicker picker, int minutes) {
-					long newTime = getCurrentTime();
-					updateCurrentTime(currentTime, newTime);
+					updateCurrentTime();
 				}
 			});
 		}
@@ -61,7 +65,13 @@ public class WheelPickersLinker<T extends LinkableWheelPicker<Long> & LimitableW
 		pickers.add(picker);
 	}
 	
-	private void updateCurrentTime(long oldTime, long newTime) {
+	private void updateCurrentTime() {
+		long newTime = getCurrentTime();
+		
+		updateCurrentTime(currentTime, newTime);
+	}
+
+	public void updateCurrentTime(long oldTime, long newTime) {
 		for (T picker: pickers) {
 			picker.setGlobalValue(newTime);
 		}
