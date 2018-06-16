@@ -78,7 +78,7 @@ public class WheelPickersLinker<T extends WheelPicker & LinkableWheelPicker<Long
 		currentTime = newTime;
 	}
 	
-	private Long getCurrentTime() {
+	public Long getCurrentTime() {
 		long dayInSec = -1, hourInSec = -1, minInSec = -1;
 		
 		for (LinkableWheelPicker picker: pickers) {
