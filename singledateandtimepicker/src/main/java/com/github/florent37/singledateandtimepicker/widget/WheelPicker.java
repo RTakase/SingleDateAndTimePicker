@@ -31,7 +31,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public abstract class WheelPicker<V> extends View {
+public abstract class WheelPicker<V, T> extends View implements LinkableWheelPicker<Long>, LimitableWheelPicker<Long, T> {
 
     public static final int SCROLL_STATE_IDLE = 0;
     public static final int SCROLL_STATE_DRAGGING = 1;
@@ -1072,6 +1072,36 @@ public abstract class WheelPicker<V> extends View {
                 return data.indexOf(value);
             }
             return position;
+        }
+    }
+    
+    protected long earlierLimit, laterLimit;
+    
+    @NonNull
+    @Override
+    public Long getEarlierLimit() {
+        return earlierLimit;
+    }
+    
+    @NonNull
+    @Override
+    public Long getLaterLimit() {
+        return laterLimit;
+    }
+    
+    protected Long currentTime;
+    
+    @Override
+    public Long getGlobalValue() {
+        return currentTime;
+    }
+    
+    @Override
+    public void setGlobalValue(Long value) {
+        Long current = getGlobalValue();
+        currentTime = value;
+        if (!value.equals(current)) {
+            updateAdapter();
         }
     }
 }

@@ -15,7 +15,7 @@ import static com.github.florent37.singledateandtimepicker.widget.SingleDateAndT
 import static com.github.florent37.singledateandtimepicker.widget.SingleDateAndTimeConstants.MAX_HOUR_DEFAULT;
 import static com.github.florent37.singledateandtimepicker.widget.SingleDateAndTimeConstants.MIN_HOUR_DEFAULT;
 
-public class WheelHourPicker extends WheelPicker<String> implements LinkableWheelPicker<Long>, LimitableWheelPicker<Long, Integer> {
+public class WheelHourPicker extends WheelPicker<String, Integer> {
 
     private int minHour;
     private int maxHour;
@@ -191,20 +191,6 @@ public class WheelHourPicker extends WheelPicker<String> implements LinkableWhee
         void onHourChanged(WheelHourPicker picker, int hour);
     }
     
-    private long earlierLimit, laterLimit;
-    
-    @NonNull
-    @Override
-    public Long getEarlierLimit() {
-        return earlierLimit;
-    }
-    
-    @NonNull
-    @Override
-    public Long getLaterLimit() {
-        return laterLimit;
-    }
-    
     @Override
     public void setLimit(Long earlier, Long later) {
         earlierLimit = earlier;
@@ -229,21 +215,5 @@ public class WheelHourPicker extends WheelPicker<String> implements LinkableWhee
         cal.set(Calendar.HOUR_OF_DAY, value);
         long time = cal.getTimeInMillis() / 1000;
         return getEarlierLimit() > time || time > getLaterLimit();
-    }
-    
-    private Long currentTime;
-    
-    @Override
-    public Long getGlobalValue() {
-        return currentTime;
-    }
-    
-    @Override
-    public void setGlobalValue(Long value) {
-        Long current = getGlobalValue();
-        currentTime = value;
-        if (!value.equals(current)) {
-            updateAdapter();
-        }
     }
 }

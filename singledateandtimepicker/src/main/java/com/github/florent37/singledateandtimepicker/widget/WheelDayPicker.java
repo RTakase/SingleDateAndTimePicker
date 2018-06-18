@@ -16,7 +16,7 @@ import java.util.List;
 
 import static com.github.florent37.singledateandtimepicker.widget.SingleDateAndTimeConstants.*;
 
-public class WheelDayPicker extends WheelPicker<String> implements LinkableWheelPicker<Long>, LimitableWheelPicker<Long, Date> {
+public class WheelDayPicker extends WheelPicker<String, Date> {
 
     private SimpleDateFormat simpleDateFormat;
 
@@ -141,33 +141,6 @@ public class WheelDayPicker extends WheelPicker<String> implements LinkableWheel
             adapter.getData().set(index, todayText);
             notifyDatasetChanged();
         }
-    }
-    
-    private Long currentTime;
-    
-    @Override
-    public Long getGlobalValue() {
-        return currentTime;
-    }
-    
-    @Override
-    public void setGlobalValue(Long value) {
-        Long current = getGlobalValue();
-        currentTime = value;
-        if (!value.equals(current)) {
-            updateAdapter();
-        }
-    }
-    
-    private long earlierLimit, laterLimit;
-    @NonNull @Override
-    public Long getEarlierLimit() {
-        return earlierLimit;
-    }
-    
-    @NonNull @Override
-    public Long getLaterLimit() {
-        return laterLimit;
     }
     
     @Override

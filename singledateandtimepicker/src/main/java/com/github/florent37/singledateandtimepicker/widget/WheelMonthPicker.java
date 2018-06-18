@@ -15,7 +15,7 @@ import java.util.Locale;
 import static com.github.florent37.singledateandtimepicker.DateHelper.getMonth;
 import static com.github.florent37.singledateandtimepicker.DateHelper.today;
 
-public class WheelMonthPicker extends WheelPicker<String> {
+public class WheelMonthPicker extends WheelPicker<String, Integer> {
 
     private int lastScrollPosition;
 
@@ -84,5 +84,16 @@ public class WheelMonthPicker extends WheelPicker<String> {
 
     public interface MonthSelectedListener {
         void onMonthSelected(WheelMonthPicker picker, int monthIndex, String monthName);
+    }
+    
+    @Override
+    public void setLimit(Long earlier, Long later) {
+        //TODO: implements
+    }
+    
+    @Override
+    public boolean isOutOfLimit(Integer value) {
+        //TODO: implements
+        return false;
     }
 }

@@ -15,7 +15,7 @@ import static com.github.florent37.singledateandtimepicker.widget.SingleDateAndT
 import static com.github.florent37.singledateandtimepicker.widget.SingleDateAndTimeConstants.MIN_MINUTES;
 import static com.github.florent37.singledateandtimepicker.widget.SingleDateAndTimeConstants.STEP_MINUTES_DEFAULT;
 
-public class WheelMinutePicker extends WheelPicker<String> implements LinkableWheelPicker<Long>, LimitableWheelPicker<Long, Integer> {
+public class WheelMinutePicker extends WheelPicker<String, Integer> {
 
     private int stepMinutes;
 
@@ -125,20 +125,6 @@ public class WheelMinutePicker extends WheelPicker<String> implements LinkableWh
         void onFinishedLoop(WheelMinutePicker picker);
     }
     
-    private long earlierLimit, laterLimit;
-    
-    @NonNull
-    @Override
-    public Long getEarlierLimit() {
-        return earlierLimit;
-    }
-    
-    @NonNull
-    @Override
-    public Long getLaterLimit() {
-        return laterLimit;
-    }
-    
     @Override
     public void setLimit(Long earlier, Long later) {
         earlierLimit = earlier;
@@ -163,21 +149,5 @@ public class WheelMinutePicker extends WheelPicker<String> implements LinkableWh
         cal.set(Calendar.MINUTE, value);
         long time = cal.getTimeInMillis() / 1000;
         return getEarlierLimit() > time || time > getLaterLimit();
-    }
-    
-    private Long currentTime;
-    
-    @Override
-    public Long getGlobalValue() {
-        return currentTime;
-    }
-    
-    @Override
-    public void setGlobalValue(Long value) {
-        Long current = getGlobalValue();
-        currentTime = value;
-        if (!value.equals(current)) {
-            updateAdapter();
-        }
     }
 }

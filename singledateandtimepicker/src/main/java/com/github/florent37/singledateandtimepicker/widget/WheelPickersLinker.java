@@ -1,12 +1,15 @@
 package com.github.florent37.singledateandtimepicker.widget;
 
+import android.content.Context;
+import android.util.AttributeSet;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public class WheelPickersLinker<T extends WheelPicker & LinkableWheelPicker<Long> & LimitableWheelPicker<Long, ?>> {
-	private ArrayList<T> pickers = new ArrayList<>();
+public class WheelPickersLinker {
+	private ArrayList<WheelPicker> pickers = new ArrayList<>();
 	
 	private long earlierLimit;
 	
@@ -23,13 +26,13 @@ public class WheelPickersLinker<T extends WheelPicker & LinkableWheelPicker<Long
 	}
 	
 	public void setDefaultDate(Date date) {
-		for (T picker: pickers) {
+		for (WheelPicker picker: pickers) {
 			picker.setDefaultDate(date);
 		}
 		updateCurrentTime(-1, date.getTime()/1000);
 	}
 	
-	public void addWheelPicker(T picker) {
+	public void addWheelPicker(WheelPicker picker) {
 		picker.setLimit(earlierLimit, laterLimit);
 		
 		if (picker instanceof WheelDayPicker) {
@@ -72,7 +75,7 @@ public class WheelPickersLinker<T extends WheelPicker & LinkableWheelPicker<Long
 	}
 
 	public void updateCurrentTime(long oldTime, long newTime) {
-		for (T picker: pickers) {
+		for (WheelPicker picker: pickers) {
 			picker.setGlobalValue(newTime);
 		}
 		currentTime = newTime;

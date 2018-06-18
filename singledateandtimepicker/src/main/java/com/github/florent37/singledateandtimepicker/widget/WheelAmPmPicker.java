@@ -15,7 +15,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class WheelAmPmPicker extends WheelPicker<String> {
+public class WheelAmPmPicker extends WheelPicker<String, String> {
 
     public static final int INDEX_AM = 0;
     public static final int INDEX_PM = 1;
@@ -105,5 +105,16 @@ public class WheelAmPmPicker extends WheelPicker<String> {
 
     public interface AmPmListener {
         void onAmPmChanged(WheelAmPmPicker pmPicker, boolean isAm);
+    }
+    
+    @Override
+    public void setLimit(Long earlier, Long later) {
+        //TODO: implements
+    }
+    
+    @Override
+    public boolean isOutOfLimit(String value) {
+        //TODO: implements
+        return false;
     }
 }
